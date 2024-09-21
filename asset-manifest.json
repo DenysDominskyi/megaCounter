@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/megaCounter/static/css/main.a29ac562.css",
-    "main.js": "/megaCounter/static/js/main.d1a70e54.js",
+    "main.js": "/megaCounter/static/js/main.cdd9baa4.js",
     "index.html": "/megaCounter/index.html",
     "main.a29ac562.css.map": "/megaCounter/static/css/main.a29ac562.css.map",
-    "main.d1a70e54.js.map": "/megaCounter/static/js/main.d1a70e54.js.map"
+    "main.cdd9baa4.js.map": "/megaCounter/static/js/main.cdd9baa4.js.map"
   },
   "entrypoints": [
     "static/css/main.a29ac562.css",
-    "static/js/main.d1a70e54.js"
+    "static/js/main.cdd9baa4.js"
   ]
 }
