@@ -1,0 +1,21 @@
+.input-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+input {
+    outline: none;
+    text-align: center;
+    border-radius: 5px;
+    width: 100px;
+}
+input:focus {
+    border: 2px solid #6CE4F9;
+}
+
+label {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #6CE4F9;
+}
