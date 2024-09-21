@@ -4,8 +4,6 @@ import { Button } from '../components/button/Button'
 
 export const Counter = () => {
 
-    console.log('rerender')
-
     // state
     const [startValue, setStartValue] = useState(0)
     const [maxValue, setMaxValue] = useState(7)
@@ -42,6 +40,27 @@ export const Counter = () => {
         setCounterValue(newValue)
         setStartValue(newValue)
     }
+
+    useEffect(() => {
+        let startValueAsString = localStorage.getItem('startValue')
+        let maxValueAsString = localStorage.getItem('maxValue')
+        let counterValueAsString = localStorage.getItem('counterValue')
+        let settingModeAsString = localStorage.getItem('settingMode')
+        let errorAsString = localStorage.getItem('error')
+        if(startValueAsString) {setStartValue(JSON.parse(startValueAsString))}
+        if(maxValueAsString) {setMaxValue(JSON.parse(maxValueAsString))}
+        if(counterValueAsString) {setCounterValue(JSON.parse(counterValueAsString))}
+        if(settingModeAsString) {setSettingMode(JSON.parse(settingModeAsString))}
+        if(errorAsString) {setError(JSON.parse(errorAsString))}
+    }, [])
+    
+    useEffect(() => {
+        localStorage.setItem('startValue', JSON.stringify(startValue))
+        localStorage.setItem('maxValue', JSON.stringify(maxValue))
+        localStorage.setItem('counterValue', JSON.stringify(counterValue))
+        localStorage.setItem('settingMode', JSON.stringify(settingMode))
+        localStorage.setItem('error', JSON.stringify(error))
+    }, [startValue, maxValue, counterValue, settingMode, error])
 
     // bll
 
