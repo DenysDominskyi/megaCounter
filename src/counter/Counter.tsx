@@ -2,68 +2,68 @@ import React, { ChangeEvent, useEffect, useState } from 'react'
 import './counter.css'
 import { Button } from '../components/button/Button'
 
+type ScreenModesType = 'count' | 'edit' | 'error'
+type SettingType = { startValue: number, maxValue: number }
+
 export const Counter = () => {
 
     // state
-    const [startValue, setStartValue] = useState(0)
-    const [maxValue, setMaxValue] = useState(7)
-    const [counterValue, setCounterValue] = useState<number>(startValue)
-    const [settingMode, setSettingMode] = useState(false)
-    const [error, setError] = useState(false)
+    const [setting, setSetting] = useState<SettingType>({
+        startValue: 0,
+        maxValue: 5
+    })
+    const [counterValue, setCounterValue] = useState<number>(setting.startValue)
+    const [screenMode, setScreenMode] = useState<ScreenModesType>('count')
 
     // functions
     const increment = () => setCounterValue(prev => prev + 1)
 
-    const reset = () => setCounterValue(startValue)
+    const reset = () => setCounterValue(setting.startValue)
 
     const set = () => {
-        setSettingMode(false)
+        setScreenMode('count')
     }
 
     const maxValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
         let newValue = Number(e.currentTarget.value)
-        if (newValue <= startValue) {
-            setError(true)
-        } else {
-            setError(false)
+        setScreenMode('edit')
+        if ( newValue <= setting.startValue || counterValue < 0) {
+            setScreenMode('error')
         }
-        setMaxValue(newValue)
+        setSetting({ ...setting, maxValue: newValue })
     }
-    
+
     const startValueHandler = (e: ChangeEvent<HTMLInputElement>) => {
         let newValue = Number(e.currentTarget.value)
-        if (newValue < 0 || newValue >= maxValue) {
-            setError(true)
-        } else {
-            setError(false)
+        setScreenMode('edit')
+        if (newValue < 0 || newValue >= setting.maxValue) {
+            setScreenMode('error')
         }
         setCounterValue(newValue)
-        setStartValue(newValue)
+        setSetting({ ...setting, startValue: newValue })
     }
 
     useEffect(() => {
-        let startValueAsString = localStorage.getItem('startValue')
-        let maxValueAsString = localStorage.getItem('maxValue')
+        let settings = localStorage.getItem('setting')
         let counterValueAsString = localStorage.getItem('counterValue')
-        let settingModeAsString = localStorage.getItem('settingMode')
-        let errorAsString = localStorage.getItem('error')
-        if(startValueAsString) {setStartValue(JSON.parse(startValueAsString))}
-        if(maxValueAsString) {setMaxValue(JSON.parse(maxValueAsString))}
-        if(counterValueAsString) {setCounterValue(JSON.parse(counterValueAsString))}
-        if(settingModeAsString) {setSettingMode(JSON.parse(settingModeAsString))}
-        if(errorAsString) {setError(JSON.parse(errorAsString))}
+        let screenModeAsString = localStorage.getItem('screenMode')
+
+        if (settings) { setSetting(JSON.parse(settings)) }
+        if (counterValueAsString) { setCounterValue(JSON.parse(counterValueAsString)) }
+        if (screenModeAsString) { setScreenMode(JSON.parse(screenModeAsString)) }
     }, [])
-    
+
     useEffect(() => {
-        localStorage.setItem('startValue', JSON.stringify(startValue))
-        localStorage.setItem('maxValue', JSON.stringify(maxValue))
+        localStorage.setItem('setting', JSON.stringify(setting))
         localStorage.setItem('counterValue', JSON.stringify(counterValue))
-        localStorage.setItem('settingMode', JSON.stringify(settingMode))
-        localStorage.setItem('error', JSON.stringify(error))
-    }, [startValue, maxValue, counterValue, settingMode, error])
+        localStorage.setItem('screenMode', JSON.stringify(screenMode))
+    }, [setting, counterValue, screenMode])
+
+    let increaseBtnDisabled = screenMode === 'edit' ? true : counterValue === setting.maxValue
+    let resetBtnDisabled = screenMode === 'edit' ? true : counterValue === setting.startValue
+    let setBtnDisabled = screenMode === 'error' || screenMode !== 'edit'
 
     // bll
-
     return (
 
         <div className='counter'>
@@ -75,10 +75,10 @@ export const Counter = () => {
                             id='max-value'
                             type="number"
                             name='max-value'
-                            value={maxValue}
+                            value={setting.maxValue}
                             onChange={maxValueHandler}
-                            onClick={() => setSettingMode(true)}
-                            className={maxValue <= startValue ? 'red' : ''}
+                            onFocus={maxValueHandler}
+                            className={setting.maxValue <= setting.startValue || setting.maxValue < 0 ? 'red' : ''}
                         />
                     </div>
                     <div className="input-group">
@@ -87,31 +87,26 @@ export const Counter = () => {
                             id='start-value'
                             type="number"
                             name='max-value'
-                            value={startValue}
+                            value={setting.startValue}
                             onChange={startValueHandler}
-                            onClick={() => setSettingMode(true)}
-                            className={startValue < 0 || startValue >= maxValue ? 'red' : ''}
+                            onFocus={startValueHandler}
+                            className={setting.startValue < 0 || setting.startValue >= setting.maxValue ? 'red' : ''}
                         />
                     </div>
                 </div>
                 <div className='button-box'>
-                    <Button title='set' callbackFunction={set} disabled={settingMode ? error : !error} />
+                    <Button title='set' callbackFunction={set} disabled={setBtnDisabled} />
                 </div>
             </div>
             <div className='container'>
                 <div className='display'>
-                    {settingMode ?
-                        error ?
-                            <p className='display-setting-error'>Incorrect value!</p> :
-                            <p className='display-setting'>enter values and press 'set'</p>
-                        :
-                        <p className={counterValue === maxValue ? 'display-max-result' : 'display-result'}>{counterValue}</p>
-                    }
-
+                    {screenMode === 'count' && <p className={counterValue === setting.maxValue ? 'display-max-result' : 'display-result'}>{counterValue}</p>}
+                    {screenMode === 'edit' && <p className='display-setting'>enter values and press 'set'</p>}
+                    {screenMode === 'error' && <p className='display-setting-error'>Incorrect value!</p>}
                 </div>
                 <div className='button-box'>
-                    <Button title='inc' callbackFunction={increment} disabled={settingMode ? true : counterValue === maxValue} />
-                    <Button title='reset' callbackFunction={reset} disabled={settingMode ? true : counterValue === startValue} />
+                    <Button title='inc' callbackFunction={increment} disabled={increaseBtnDisabled} />
+                    <Button title='reset' callbackFunction={reset} disabled={resetBtnDisabled} />
                 </div>
             </div>
         </div>

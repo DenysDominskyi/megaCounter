@@ -2,6 +2,7 @@
 import { Counter } from './counter/Counter';
 
 function App() {
+
   return (
     <div>
       <Counter />
