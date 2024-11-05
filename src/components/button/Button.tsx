@@ -1,25 +1,23 @@
-import React, { useState } from 'react'
+import React, { ButtonHTMLAttributes, DetailedHTMLProps, useState } from 'react'
 import './button.css'
 
-type ButtonPropsType = {
+type DefaultButtonPropsType = DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>,
+HTMLButtonElement>
+
+type ButtonPropsType = DefaultButtonPropsType & {
     title: string
-    disabled?: boolean
-    callbackFunction: () => void
 }
 
-export const Button = (props: ButtonPropsType) => {
-
-    const onClickHandler = () => {
-        props.callbackFunction()
-    }
-
+const ButtonForMemo = ({title ,...rest}: ButtonPropsType) => {
+    // console.log(`button ${title}`)
     return (
         <button
-            disabled={props.disabled}
             className='button'
-            onClick={onClickHandler}
+            {...rest}
         >
-            {props.title}
+            {title}
         </button>
     )
 }
+
+export const Button = React.memo(ButtonForMemo)
